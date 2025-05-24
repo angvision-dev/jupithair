@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jupithair/common/default_height_gap.dart';
+import 'package:jupithair/features/social_media/models/provider.dart';
 
 class PublicationForm extends StatefulWidget {
   final bool isKeyboardVisible;
   const PublicationForm({super.key, required this.isKeyboardVisible});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PublicationFormState createState() => _PublicationFormState();
 }
 
@@ -57,11 +60,11 @@ class _PublicationFormState extends State<PublicationForm> {
   }
 }
 
-class _TitleInput extends StatelessWidget {
+class _TitleInput extends ConsumerWidget {
   const _TitleInput();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
@@ -75,6 +78,8 @@ class _TitleInput extends StatelessWidget {
         children: [
           TextFormField(
             textAlign: TextAlign.center,
+            onChanged: (title) =>
+                ref.read(riverpodForm.notifier).setTitle(title),
             decoration: const InputDecoration(
               hintText: 'Titre de la publication',
               border: InputBorder.none,
@@ -87,49 +92,11 @@ class _TitleInput extends StatelessWidget {
   }
 }
 
-class _DynamicContentInput extends StatefulWidget {
-  @override
-  _DynamicContentInputState createState() => _DynamicContentInputState();
-}
-
-class _DynamicContentInputState extends State<_DynamicContentInput> {
+class _DynamicContentInput extends ConsumerWidget {
   final TextEditingController _controller = TextEditingController();
-  double _boxHeight = 30; // Initial height
 
   @override
-  void initState() {
-    super.initState();
-    _controller.addListener(_adjustHeight);
-  }
-
-  @override
-  void dispose() {
-    _controller.removeListener(_adjustHeight);
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _adjustHeight() {
-    final textSpan = TextSpan(
-      text: _controller.text,
-      style: const TextStyle(fontSize: 16.0), // Match TextFormField font
-    );
-    final textPainter = TextPainter(
-      text: textSpan,
-      maxLines: null,
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout(
-        maxWidth: MediaQuery.of(context).size.width - 32); // Adjust width
-
-    setState(() {
-      _boxHeight = textPainter.height + 10; // Adjust height dynamically
-      _boxHeight = _boxHeight.clamp(50.0, 180.0); // Min 50px, Max 200px
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       margin: const EdgeInsets.only(left: 10, right: 10),
       padding: const EdgeInsets.all(8.0),
@@ -147,6 +114,8 @@ class _DynamicContentInputState extends State<_DynamicContentInput> {
         width: double.infinity,
         child: TextFormField(
           controller: _controller,
+          onChanged: (content) =>
+              ref.read(riverpodForm.notifier).setContent(content),
           textAlign: TextAlign.left,
           decoration: const InputDecoration(
             hintText: 'Content',
@@ -154,7 +123,7 @@ class _DynamicContentInputState extends State<_DynamicContentInput> {
             hintStyle: TextStyle(color: Colors.grey),
           ),
           maxLines: null, // Unlimited lines, auto-wrap
-          maxLength: 200,
+          maxLength: 100,
           keyboardType: TextInputType.multiline,
           textInputAction: TextInputAction.newline,
         ),

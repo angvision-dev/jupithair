@@ -27,6 +27,11 @@ class FormTextModel extends ChangeNotifier {
   String? content;
   String? region;
   String? category;
+  FormTextModel(
+      {required this.title,
+      required this.content,
+      required this.region,
+      required this.category});
 
   void getForm(String title, String content, String region, String category) {
     this.title = title;

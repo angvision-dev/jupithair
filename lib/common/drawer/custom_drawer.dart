@@ -25,6 +25,7 @@ class CustomDrawer extends StatelessWidget {
         ...titles.asMap().entries.map((entry) {
           int index = entry.key;
           String title = entry.value;
+
           return ListTile(
             title: Text(title),
             onTap: () {
